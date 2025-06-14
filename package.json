@@ -1,0 +1,48 @@
+{
+	"name": "cx-amqp",
+	"version": "0.0.1",
+	"description": "ConnexCS Opinionated AMQP Wrapper",
+	"main": "index.js",
+	"type": "module",
+	"scripts": {
+		"test": "jest dist/",
+		"dev": "ts-node index.ts",
+		"build": "tsc"
+	},
+	"keywords": [
+		"amqp"
+	],
+	"author": "Jonathan Hulme <jhulme@connexcs.com>",
+	"license": "MIT",
+	"dependencies": {
+		"amqp-connection-manager": "^4.1.14",
+		"chalk": "^5.4.1",
+		"jest": "^30.0.0"
+	},
+	"devDependencies": {
+		"@babel/preset-typescript": "^7.27.1",
+		"@types/jest": "^29.5.14",
+		"toml": "^3.0.0",
+		"ts-jest": "^29.4.0",
+		"tsx": "^4.20.3",
+		"typescript": "^5.8.3"
+	},
+	"jest": {
+		"preset": "ts-jest",
+		"testEnvironment": "node",
+		"testMatch": [
+			"**/dist/**/*.test.js"
+		],
+		"transform": {
+			"^.+\\.ts$": "ts-jest"
+		},
+		"collectCoverageFrom": [
+			"dist/**/*.js"
+		],
+		"coverageDirectory": "coverage",
+		"coverageReporters": [
+			"text",
+			"lcov"
+		]
+	}
+}

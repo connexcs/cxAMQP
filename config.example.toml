@@ -1,0 +1,20 @@
+##############################################
+# Example TOML file for cxAMQP
+##############################################
+
+[cxAMQP]
+# All servers follow a FQDN convention with injectable host name replacable by {host}
+defaultUrl = 'amqp://user:password@{host}.domain.com'
+# Array of hosts
+hosts = ['host1', 'host2', 'host3']
+
+# Anything not listed will send to queue directly
+
+#[[cxAMQP.bindings]]
+#exchange = "amq.topic"
+#queue = "test"
+##topic = ["test-topic", "test-topic2"]
+
+#headers = {name="value", name2="value2"}
+
+
