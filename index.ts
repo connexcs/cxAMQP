@@ -19,10 +19,15 @@ type AMQPOpts = {
 }
 
 export default class CxAMQP {
+	async send(queue: string, data: any, connectionName: string | null = null, routingKey: string, opts = {} ): Promise<void> {
 	#config: AMQPConfig
 	#connections: Record<string, AmqpConnectionManager> = {}
 	#channels: Record<string, ChannelWrapper> = {}
 	#opts: AMQPOpts = {}
+	#resolveStarted: () => void
+	#started = new Promise<void>((resolve) => {
+		this.#resolveStarted = resolve
+	});
 
 	constructor(config: AMQPConfig, opts: AMQPOpts = {}) {
 		this.#opts = opts
@@ -38,7 +43,7 @@ export default class CxAMQP {
 			})
 		}
 
-		this.#config.hosts.forEach(host => {
+		const channelsStarted = this.#config.hosts.map(host => {
 			const url = this.#config.defaultUrl.replace('{host}', host)
 			this.#connections[host] = amqp.connect([url], { connectionOptions: { timeout: 5000 }, heartbeatIntervalInSeconds: 60, reconnectTimeInSeconds: 60 })
 			const redactedUrl = this.redactPassword(url)
@@ -58,24 +63,33 @@ export default class CxAMQP {
 			this.#connections[host].on('unblocked', () => {
 				console.log(chalk.green(`AMQP server at ${redactedUrl} is unblocked`))
 			})
-
-			this.#connections[host].createChannel({
-				json: true,
-				setup: async (channel: any) => {
-					this.#channels[host] = channel
-					return true
-				}
-			})
+			return new Promise(resolve => {
+				this.#connections[host].createChannel({
+					json: true,
+					setup: async (channel: any) => {
+						this.#channels[host] = channel
+						resolve(true);
+						return true
+					}
+				})
+			});
 		})
+		await Promise.all(channelsStarted)
+		console.log(chalk.green('All AMQP channels started successfully'))
+		this.#resolveStarted();
 	}
 
-	async send(queue: string, data: any, connectionName: string | null = null): Promise<void> {
+	async send(queue: string, data: any, connectionName: string | null = null, routingKey: string, opts = {} ): Promise<void> {
+		await this.#started // Ensure the AMQP connection is established before sending
 		let channel = connectionName && this.#channels[connectionName]
 		if (!channel) channel = Object.values(this.#channels)[0]
+
+		if (!channel) throw new Error('No channel available to send message')
+
 		const json = Buffer.from(JSON.stringify(data))
 
 		if (queue.startsWith('#')) {
-			await channel.publish(queue.substring(1), json.toString(), { persistent: true })
+			await channel.publish(queue.substring(1), routingKey, json, { persistent: true, ...opts })
 		} else {
 			await channel.sendToQueue(queue, json)
 		}
