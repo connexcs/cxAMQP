@@ -2,7 +2,7 @@
 	"name": "cx-amqp",
 	"version": "0.0.1",
 	"description": "ConnexCS Opinionated AMQP Wrapper",
-	"main": "index.js",
+	"main": "dist/index.js",
 	"type": "module",
 	"scripts": {
 		"test": "vitest run",
