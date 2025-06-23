@@ -19,17 +19,17 @@ type AMQPOpts = {
 }
 
 export default class CxAMQP {
-	async send(queue: string, data: any, connectionName: string | null = null, routingKey: string, opts = {} ): Promise<void> {
 	#config: AMQPConfig
 	#connections: Record<string, AmqpConnectionManager> = {}
 	#channels: Record<string, ChannelWrapper> = {}
 	#opts: AMQPOpts = {}
-	#resolveStarted: () => void
-	#started = new Promise<void>((resolve) => {
-		this.#resolveStarted = resolve
-	});
+	#started: Promise<void>
+	#resolveStarted!: () => void
 
 	constructor(config: AMQPConfig, opts: AMQPOpts = {}) {
+		this.#started = new Promise<void>((resolve) => {
+			this.#resolveStarted = resolve
+		});
 		this.#opts = opts
 		if (!config) throw new Error('cxAMQP configuration is required')
 		this.#config = JSON.parse(JSON.stringify(config))
@@ -79,7 +79,13 @@ export default class CxAMQP {
 		this.#resolveStarted();
 	}
 
-	async send(queue: string, data: any, connectionName: string | null = null, routingKey: string, opts = {} ): Promise<void> {
+	async send(
+		queue: string,
+		data: any,
+		connectionName?: string | null,
+		routingKey?: string,
+		opts: Record<string, any> = {}
+	): Promise<void> {
 		await this.#started // Ensure the AMQP connection is established before sending
 		let channel = connectionName && this.#channels[connectionName]
 		if (!channel) channel = Object.values(this.#channels)[0]
@@ -89,7 +95,7 @@ export default class CxAMQP {
 		const json = Buffer.from(JSON.stringify(data))
 
 		if (queue.startsWith('#')) {
-			await channel.publish(queue.substring(1), routingKey, json, { persistent: true, ...opts })
+			await channel.publish(queue.substring(1), routingKey ?? '', json, opts)
 		} else {
 			await channel.sendToQueue(queue, json)
 		}
