@@ -51,10 +51,8 @@ await cxAMQP.send(queueName, {hello: 'World'}, 'test1')
 // Send to an exchange with a topic
 await cxAMQP.send('#amq.topic', {hello: 'World'}, null, 'test-topic')
 
-
 //Send to an exchange with headers
 await cxAMQP.send('#amq.headers', {hello: 'World'}, null, '', { headers: {headerKey: 'headerValue'} })
-
 ```
 
 # API Documentation
