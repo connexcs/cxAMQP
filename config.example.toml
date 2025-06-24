@@ -8,13 +8,17 @@ defaultUrl = 'amqp://user:password@{host}.domain.com'
 # Array of hosts
 hosts = ['host1', 'host2', 'host3']
 
-# Anything not listed will send to queue directly
+# List all the queues which we will pull from on all hosts
+[cxAMQP.queue]
+pull = ['test']
 
-#[[cxAMQP.bindings]]
-#exchange = "amq.topic"
-#queue = "test"
-##topic = ["test-topic", "test-topic2"]
+# Bindings
+[[cxAMQP.bindings]]
+exchange = "amq.topic"
+queue = "test-topic"
+topic = ["test-topic"]
 
-#headers = {name="value", name2="value2"}
-
-
+[[cxAMQP.bindings]]
+exchange = "amq.headers"
+queue = "test-headers"
+headers = {hello = "world"}

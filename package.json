@@ -8,7 +8,8 @@
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"dev": "tsx index.ts",
-		"build": "tsc"
+		"build": "tsc",
+		"docs": "npx typedoc --plugin typedoc-plugin-markdown index.ts --out docs --readme none"
 	},
 	"keywords": [
 		"amqp"
@@ -23,6 +24,8 @@
 		"@types/node": "^24.0.3",
 		"toml": "^3.0.0",
 		"tsx": "^4.20.3",
+		"typedoc": "^0.28.5",
+		"typedoc-plugin-markdown": "^4.7.0",
 		"typescript": "^5.8.3",
 		"vitest": "^3.2.3"
 	}
