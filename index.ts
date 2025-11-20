@@ -101,8 +101,8 @@ export default class CxAMQP {
 				})
 			});
 		})
-		await Promise.all(channelsStarted)
-		this.#log('INFO', 'All AMQP channels started successfully')
+		await Promise.race(channelsStarted)
+		this.#log('INFO', 'At least one AMQP channel started successfully')
 		this.#resolveStarted();
 	}
 
