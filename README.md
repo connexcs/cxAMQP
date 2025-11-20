@@ -34,7 +34,7 @@ const config = configRaw.cxAMQP
 const queueName = 'test'
 const message = { text: 'Hello, cxAMQP!' }
 
-const queueName = 'test'
+const cxAMQP = new CxAMQP(config);
 
 // Receive Message
 await cxAMQP.consume(queueName, (data, msg) => {
